@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 Cell[][] grid;
 Cell[][] next;
 int cols;
@@ -5,6 +7,11 @@ int rows;
 int resolution = 10; //3 is the lowest we can go here
 int generation = 0;
 final int NUM_STATES = 75;
+int resurectionCount;
+int maxAlive;
+int minAlive;
+
+
 
 class stateChange {
   int state;
@@ -34,8 +41,21 @@ class Cell {
   stateChange[] stateChanges;
 }
 
+void settings() {
+  String[] arr = {""};
+  String op1s = JOptionPane.showInputDialog(frame, "Please enter your: \nDesired game width\nDesired game height\nResurection neighbor count\nMax alive neighbors\nMin alive neighbors\nSEPERATED BY A SINGLE COMMA WITH NO SPACES\nDefault values are given for Conway's Game of Life", "1000,1000,3,3,2");
+  if (op1s != null) 
+    arr = op1s.split(",", 5); 
+
+  size(Integer.valueOf(arr[0])+200, Integer.valueOf(arr[1]));
+  resurectionCount = Integer.valueOf(arr[2]);
+  maxAlive = Integer.valueOf(arr[3]);
+  minAlive = Integer.valueOf(arr[4]);
+}
+
+
 void setup() {
-  size(1100, 1000);
+
   cols = (width-200) / resolution;
   rows = height / resolution;
   grid = new Cell[cols][rows];
@@ -56,6 +76,7 @@ void setup() {
   }
 }
 
+
 void draw() {
 
   background(0);
@@ -64,18 +85,44 @@ void draw() {
     for (int j = 0; j < rows; j++) {
       int x = i * resolution;
       int y = j * resolution;
+      if (grid[i][j].iterator <= 10) {
+        fill(  0, 9, 229);
+      } else
+        if (grid[i][j].iterator <=20 && grid[i][j].iterator > 10) {
+          fill(  0, 182, 221);
+        } else
+          if (grid[i][j].iterator <=30 && grid[i][j].iterator > 20) {
+            fill(  0, 217, 169);
+          } else
+            if (grid[i][j].iterator <=40 && grid[i][j].iterator > 30) {
+              fill(  1, 210, 0);
+            } else
+              if (grid[i][j].iterator <=50 && grid[i][j].iterator > 40) {
+                fill(  160, 202, 0);
+              } else
+                if (grid[i][j].iterator <=60 && grid[i][j].iterator > 50) {
+                  fill(  198, 161, 0);
+                } else
+                  if (grid[i][j].iterator <=70 && grid[i][j].iterator > 60) {
+                    fill(194, 81, 0);
+                  } else
+                    if (grid[i][j].iterator > 70) {
+                      fill(194, 4, 0);
+                    } 
       if (grid[i][j].value == 1) {
         fill(255);
-        stroke(0);
-        rect(x, y, resolution - 1, resolution - 1);
       }
-      //} else if (grid[i][j].stateChanges[0].state != 2) {
-      //  fill(100);
-      //  stroke(0);
-      //  rect(x, y, resolution - 1, resolution - 1);
-      //}
+      stroke(0);
+      rect(x, y, resolution - 1, resolution - 1);
+      fill(255);
     }
+    // else if (grid[i][j].stateChanges[0].state != 2) {
+    //  fill(100);
+    //  stroke(0);
+    //  rect(x, y, resolution - 1, resolution - 1);
+    //}
   }
+
 
   Cell[][] next = new Cell[cols][rows];
   for (int i = 0; i < cols; i++) {
@@ -92,13 +139,13 @@ void draw() {
       // Count live neighbors!
       int neighbors = countNeighbors(grid, i, j);
 
-      if (state == 0 && neighbors == 3) {      
+      if (state == 0 && neighbors == resurectionCount) {      
         next[i][j].value = 1;
         if ( grid[i][j].value != next[i][j].value) {
           logChange(next, i, j, state, next[i][j].iterator);
           next[i][j].iterator++;
         }
-      } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+      } else if (state == 1 && (neighbors < minAlive || neighbors > maxAlive)) {
         next[i][j].value = 0;
         if ( grid[i][j].value != next[i][j].value) {
           logChange(next, i, j, state, next[i][j].iterator);
